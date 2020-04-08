@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-interface PokemonListResponse {
-  created: string,
-  modified: string,
+
+interface Pokemon {
   name: string,
-  pokemon: any[],
+  url: string,
+  number: number
+  types: string[]
+}
+interface PokemonListResponse {
+  count: number,
+  next: string,
+  previous: string,
+  results: any[],
   resource_uri: string
 }
 
@@ -15,31 +22,38 @@ interface PokemonListResponse {
 })
 export class PokeapiService {
 
-  private url = 'https://dev.treinaweb.com.br/pokeapi';
-  pokemonList = []
+  private url = 'https://pokeapi.co/api/v2/pokemon';
+  pokemonList: Pokemon[] = [];
+  pokemonTypes: string[] = [];
 
   constructor(
     private http: HttpClient
   ) { }
 
-  listAll() {
-    this.http.get<PokemonListResponse>(`${this.url}/pokedex/1`)
+  fetchPokemons() {
+    this.http.get<PokemonListResponse>(`${this.url}/?limit=20&offset=0`)
       .subscribe(
         response => {
-          response.pokemon.forEach(pokemon => {
-            pokemon.number = this.getNumberFromUrl(pokemon.resource_uri)
+          response.results.forEach(pokemon => {
+            pokemon.number = this.getNumberFromUrl(pokemon.url)
           })
-          this.pokemonList = this.sortPokemon(response.pokemon)
+          this.pokemonList = this.sortPokemon(response.results)
             .filter(pokemon => pokemon.number < 1000)
         }
       )
   }
 
-  private getNumberFromUrl(url) {
+  fetchPokemonType(pokemonNumber: number) {
+    return this.http.get<any>(`${this.url}/${pokemonNumber}`).toPromise();
+    /*  this.pokemonTypes = data.types.map(t => t.type.name);
+     return data.types.map(t => t.type.name) */
+  }
+
+  private getNumberFromUrl(url: string) {
     return parseInt(url.replace(/.*\/(\d+)\/$/, '$1'));
   }
 
-  private sortPokemon(pokemonList) {
+  private sortPokemon(pokemonList: Pokemon[]) {
     return pokemonList.sort((a, b) => {
       return (a.number > b.number ? 1 : -1);
     })

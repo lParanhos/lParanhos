@@ -19,18 +19,26 @@ export class ListComponent implements OnInit {
 
   get pkmSprite() {
     const number = ("000" + this.selectedPkm.number).slice(-3);
-    return `//serebii.net/sunmoon/pokemon/${number}.png`;
+    return `//assets.pokemon.com/assets/cms2/img/pokedex/detail/${number}.png`;
   }
+
+
 
   constructor(
     private pokeapi: PokeapiService
   ) { }
 
   ngOnInit(): void {
-    this.pokeapi.listAll();
+    this.pokeapi.fetchPokemons();
   }
 
-  selectPokemon(pkm) {
-    this.selectedPkm = pkm;
+  async getPkmType(number: number) {
+    const data = await this.pokeapi.fetchPokemonType(number)
+    return data.types.map((t: any) => t.type.name);
+  }
+
+  async selectPokemon(pkm) {
+    const types = await this.getPkmType(pkm.number);
+    this.selectedPkm = { ...pkm, types };
   }
 }
