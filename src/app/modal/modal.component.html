@@ -1,0 +1,16 @@
+<div id="modal-content-wrapper">
+    <figure id="avatar">
+        <img class="pkmImg"
+            src="//assets.pokemon.com/assets/cms2/img/pokedex/detail/{{ data.number | number: '3.0-0'}}.png">
+    </figure>
+    <header id="modal-header">
+        <h1 id="modal-title">Are you sure you want to logout?</h1>
+    </header>
+    <section id="modal-body">
+        <p>{{  data.name }}</p>
+    </section>
+    <footer id="modal-footer">
+        <button mat-raised-button id="modal-action-button">Logout</button>
+        <button mat-raised-button id="modal-cancel-button" (click)="closeModal()">Go back</button>
+    </footer>
+</div>
